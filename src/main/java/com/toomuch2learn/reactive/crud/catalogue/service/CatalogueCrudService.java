@@ -19,8 +19,8 @@ import java.time.Instant;
  *
  * @author Madan Narra
  */
-@Service
 @Slf4j
+@Service
 public class CatalogueCrudService {
 
     private final ApplicationEventPublisher publisher;
@@ -45,10 +45,10 @@ public class CatalogueCrudService {
         catalogueItem.setCreatedOn(Instant.now());
 
         return
-                catalogueRepository
-                        .save(catalogueItem)
-                        .doOnSuccess(item -> publishCatalogueItemEvent(CatalogueItemEvent.CATALOGUEITEM_CREATED, item))
-                        .flatMap(item -> Mono.just(item.getId()));
+            catalogueRepository
+                .save(catalogueItem)
+                .doOnSuccess(item -> publishCatalogueItemEvent(CatalogueItemEvent.CATALOGUEITEM_CREATED, item))
+                .flatMap(item -> Mono.just(item.getId()));
     }
 
     public void updateCatalogueItem(CatalogueItem catalogueItem) throws ResourceNotFoundException{
@@ -56,18 +56,18 @@ public class CatalogueCrudService {
         Mono<CatalogueItem> catalogueItemfromDB = getCatalogueItemBySku(catalogueItem.getSku());
 
         catalogueItemfromDB.subscribe(
-                value -> {
-                    value.setName(catalogueItem.getName());
-                    value.setDescription(catalogueItem.getDescription());
-                    value.setPrice(catalogueItem.getPrice());
-                    value.setInventory(catalogueItem.getInventory());
-                    value.setUpdatedOn(Instant.now());
+            value -> {
+                value.setName(catalogueItem.getName());
+                value.setDescription(catalogueItem.getDescription());
+                value.setPrice(catalogueItem.getPrice());
+                value.setInventory(catalogueItem.getInventory());
+                value.setUpdatedOn(Instant.now());
 
-                    catalogueRepository
-                            .save(value)
-                            .doOnSuccess(item -> publishCatalogueItemEvent(CatalogueItemEvent.CATALOGUEITEM_UPDATED, item))
-                            .subscribe();
-                });
+                catalogueRepository
+                    .save(value)
+                    .doOnSuccess(item -> publishCatalogueItemEvent(CatalogueItemEvent.CATALOGUEITEM_UPDATED, item))
+                    .subscribe();
+            });
     }
 
     public void deleteCatalogueItem(CatalogueItem catalogueItem) {
@@ -78,8 +78,8 @@ public class CatalogueCrudService {
 
     private Mono<CatalogueItem> getCatalogueItemBySku(String skuNumber) throws ResourceNotFoundException {
         return catalogueRepository.findBySku(skuNumber)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new ResourceNotFoundException(
-                        String.format("Catalogue Item not found for the provided SKU :: %s" , skuNumber)))));
+            .switchIfEmpty(Mono.defer(() -> Mono.error(new ResourceNotFoundException(
+                String.format("Catalogue Item not found for the provided SKU :: %s" , skuNumber)))));
     }
 
     private final void publishCatalogueItemEvent(String eventType, CatalogueItem item) {
